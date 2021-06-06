@@ -151,4 +151,8 @@ public class AdornedRules {
         }
         return str;
     }
+
+    public ArrayList<AdornedTgd> getAdornedRules() {
+        return (ArrayList<AdornedTgd>) adornedRules;
+    }
 }

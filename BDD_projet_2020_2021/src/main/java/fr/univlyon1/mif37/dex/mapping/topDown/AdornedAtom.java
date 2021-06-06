@@ -52,6 +52,18 @@ public class AdornedAtom {
         //DONE-end
     }
 
+    public Atom getAtom() {
+        return atom;
+    }
+
+    public List<Boolean> getAdornment() {
+        return adornment;
+    }
+
+    public int getBound() {
+        return bound;
+    }
+
     @Override
     public boolean equals (Object o) {
         if(o instanceof AdornedAtom){

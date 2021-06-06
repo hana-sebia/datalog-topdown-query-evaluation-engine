@@ -1,5 +1,9 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 import fr.univlyon1.mif37.dex.mapping.Value;
+import fr.univlyon1.mif37.dex.mapping.Variable;
+
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 /**
  * @juba BDD
@@ -14,7 +18,7 @@ public class TermSchema {
     /**
      * The attributes of this schema.
      */
-    public final List<Value> attributes;
+    public final List<Variable> attributes;
 
     /**
      * Constructs a schema from a list of terms.
@@ -22,8 +26,24 @@ public class TermSchema {
      * @param terms
      *            the terms
      */
-    public TermSchema(List<Value> terms) {
-        this.attributes = terms;
+    public TermSchema(List<Variable> terms) {
+        this.attributes = new ArrayList<>();
+        attributes.addAll(terms);
+    }
+
+
+    public String toString(int i) {
+        String str = "";
+        str += "sup" + i + "(";
+        int j = 0;
+        for(Variable v :attributes) {
+            str += v;
+            if(j  != attributes.size() - 1)
+            str += ",";
+            ++j;
+        }
+        str += ")";
+        return str;
     }
 
 }

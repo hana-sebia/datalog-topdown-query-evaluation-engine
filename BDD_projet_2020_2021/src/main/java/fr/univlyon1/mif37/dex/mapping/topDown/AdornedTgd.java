@@ -27,6 +27,14 @@ public class AdornedTgd {
         this.body = body;
     }
 
+    public AdornedAtom getHead() {
+        return head;
+    }
+
+    public List<AdornedAtom> getBody() {
+        return body;
+    }
+
     @Override
     public String toString() {
         String str = "";

@@ -1,19 +1,18 @@
 package fr.univlyon1.mif37.dex;
 
-import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
 
 
-import fr.univlyon1.mif37.dex.mapping.Tgd;
 import fr.univlyon1.mif37.dex.mapping.topDown.AdornedRules;
+import fr.univlyon1.mif37.dex.mapping.topDown.AdornedTgd;
+import fr.univlyon1.mif37.dex.mapping.topDown.QsqTemplate;
 import fr.univlyon1.mif37.dex.parser.MappingParser;
 import fr.univlyon1.mif37.dex.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+
 
 public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
@@ -30,5 +29,8 @@ public class App {
 
         AdornedRules adornedRules = new AdornedRules(mapping);
         System.out.println(adornedRules.toString());
+        ArrayList<AdornedTgd> rules = adornedRules.getAdornedRules();
+        QsqTemplate qsqTemplate = new QsqTemplate(rules.get(4));
+        System.out.println(qsqTemplate.toString());
     }
 }
