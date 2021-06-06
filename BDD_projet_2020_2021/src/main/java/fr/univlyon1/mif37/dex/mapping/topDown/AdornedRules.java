@@ -1,7 +1,6 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
 import fr.univlyon1.mif37.dex.mapping.*;
-import fr.univlyon1.mif37.dex.mapping.Relation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,9 +8,11 @@ import java.util.List;
 
 public class AdornedRules {
     Collection<AdornedTgd> adornedRules;
+    Collection<AdornedAtom> adornedPredicates;
 
     public AdornedRules(final Mapping map) {
         adornedRules = new ArrayList<>();
+        adornedPredicates = new ArrayList<>();
         init(map);
     }
 
@@ -28,11 +29,13 @@ public class AdornedRules {
                     }
                 }
                 AdornedAtom adornedHead = new AdornedAtom(t.getRight(), booleans);
-                System.out.println(adornedHead);
                 // Pour chaque literal de la query je calcule l'ornement
-                for(Literal l :t.getLeft()) {
+                Literal l;
+                for(int i = 0; i < t.getLeft().size(); i++){
+                    l = t.getLeft().get(i);
                     // Si c'est un EDB, je stocke le nom de variables que je connais
                     if(map.getEdbNames().contains(l.getAtom().getName())){
+                        booleans.clear();
                         for (Value v : l.getAtom().getArgs()) {
                             if (v instanceof Variable) {
                                 if (!knownVars.contains(((Variable) v).getName())) {
@@ -40,6 +43,7 @@ public class AdornedRules {
                                 }
                             }
                         }
+                        body.add(new AdornedAtom(l.getAtom(), booleans));
                     }
                     // Je vérifie qu'il s'agit bien d'un IDB
                     else if(map.getIdbNames().contains(l.getAtom().getName())) {
@@ -59,7 +63,7 @@ public class AdornedRules {
                         }
                         // j'ajoute l'Atom dans le body
                         AdornedAtom atom = new AdornedAtom(l.getAtom(), booleans);
-                        System.out.println(atom);
+                        adornedPredicates.add(atom);
                         body.add(atom);
 
                         for(Tgd rule : map.getTgds()){
@@ -67,7 +71,6 @@ public class AdornedRules {
                                 recursiveAdornedRules(map, rule, booleans);
                             }
                         }
-
                     }
                 }
                 adornedRules.add(new AdornedTgd(adornedHead, body));
@@ -81,6 +84,7 @@ public class AdornedRules {
         List<String> knownVariables = new ArrayList<>();
         List<AdornedAtom> body = new ArrayList<>();
         AdornedAtom adHead= new AdornedAtom(rule.getRight(), adornement);
+
         int i;
         for(i = 0; i < rule.getRight().getArgs().length; i++) {
             if(rule.getRight().getArgs()[i] instanceof Variable) {
@@ -90,9 +94,12 @@ public class AdornedRules {
             }
         }
 
-        for(Literal l :rule.getLeft()) {
+        Literal l;
+        for(i = 0; i < rule.getLeft().size(); i++){
+            l = rule.getLeft().get(i);
             // Si c'est un EDB, je stocke le nom de variables que je connais
             if(map.getEdbNames().contains(l.getAtom().getName())){
+                booleans.clear();
                 for (Value v : l.getAtom().getArgs()) {
                     if (v instanceof Variable) {
                         if (!knownVariables.contains(((Variable) v).getName())) {
@@ -100,9 +107,11 @@ public class AdornedRules {
                         }
                     }
                 }
+                body.add(new AdornedAtom(l.getAtom(), booleans));
+
             }
             // Je vérifie qu'il s'agit bien d'un IDB
-            if(map.getIdbNames().contains(l.getAtom().getName())) {
+            else if(map.getIdbNames().contains(l.getAtom().getName())) {
                 // Pour chaque value d'un IDB
                 booleans.clear();
                 for (Value v : l.getAtom().getArgs()) {
@@ -118,7 +127,16 @@ public class AdornedRules {
                     }
                 }
                 // j'ajoute l'Atom dans le body
-                body.add(new AdornedAtom(l.getAtom(), booleans));
+                AdornedAtom atom = new AdornedAtom(l.getAtom(), booleans);
+                body.add(atom);
+                if(!adornedPredicates.contains(atom)){
+                    adornedPredicates.add(atom);
+                    for(Tgd r : map.getTgds()){
+                        if(r.getRight().getName().equals(l.getAtom().getName())) {
+                            recursiveAdornedRules(map, r, booleans);
+                        }
+                    }
+                }
             }
         }
         adornedRules.add(new AdornedTgd(adHead, body));

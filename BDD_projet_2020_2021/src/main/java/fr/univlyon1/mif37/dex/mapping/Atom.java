@@ -38,6 +38,14 @@ public class Atom {
     }
 
     @Override
+    public boolean equals (Object o) {
+        if (o instanceof Atom){
+            return name.equals(((Atom) o).name);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         String result = "";
         result += name + "(";
@@ -53,6 +61,9 @@ public class Atom {
     }
 
     public String toString(String adorned) {
+        if (adorned.equals("")) {
+            return toString();
+        }
         String result = "";
         result += name + "^" + adorned + "(";
         int i = 1;

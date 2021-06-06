@@ -19,27 +19,16 @@ public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws Exception {
-        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple2.txt"));
+        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple3.txt"));
         Mapping mapping = mp.mapping();
         LOG.info("\n"+mapping.toString());
         LOG.info("Parsed {} edb(s), {} idb(s) and {} tgd(s).",
                 mapping.getEDB().size(),
                 mapping.getIDB().size(),
                 mapping.getTgds().size());
-        Collection<Tgd> tgd = new ArrayList<>(mapping.getTgds());
-        List<Literal> list = new ArrayList<>();
-        for(Tgd t: tgd){
-            list.clear();
-            for(Literal s: t.getLeft()) {
-                list.add(s);
-            }
-            for (int i = list.size() - 1; i >= 0; i--) {
-                System.out.print(list.get(i).getAtom().getName());
-            }
-            System.out.println(" ");
-        }
+
 
         AdornedRules adornedRules = new AdornedRules(mapping);
-        //System.out.println(adornedRules.toString());
+        System.out.println(adornedRules.toString());
     }
 }

@@ -1,6 +1,7 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 import fr.univlyon1.mif37.dex.mapping.Atom;
 
+import java.util.ArrayList;
 import java.util.List;
 /**
  * @juba BDD
@@ -40,14 +41,24 @@ public class AdornedAtom {
     public AdornedAtom(Atom atom, List<Boolean> adornment) {
         //DONE-begin
         this.atom = atom;
-        this.adornment = adornment;
+        this.adornment = new ArrayList<>();
         this.bound = 0;
         for (Boolean a : adornment) {
+            this.adornment.add(a);
             if (a) {
                 this.bound++;
             }
         }
         //DONE-end
+    }
+
+    @Override
+    public boolean equals (Object o) {
+        if(o instanceof AdornedAtom){
+            boolean b;
+            return (((AdornedAtom) o).adornment.equals(adornment) && ((AdornedAtom) o).atom.equals(atom));
+        }
+        return false;
     }
 
     @Override
