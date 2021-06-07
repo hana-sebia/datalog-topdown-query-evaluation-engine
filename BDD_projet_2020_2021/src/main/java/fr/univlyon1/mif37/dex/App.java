@@ -68,9 +68,9 @@ public class App {
         variables1.add(z);
 
         List<Variable> variables2 = new ArrayList<>();
-        variables2.add(x);
         variables2.add(w);
-        variables2.add(z);
+        //variables2.add(z);
+        //variables2.add(z);
 
         List<Tuple> t1 = new ArrayList<>();
         t1.add(new Tuple(Arrays.asList(e1)));
@@ -83,8 +83,8 @@ public class App {
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r1 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables1, t1);
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r2 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables2, t2);
 
-        Relation join = r1.join(r2);
-        System.out.println(join.toString());
+        //Relation join = r1.join(r2);
+        System.out.println(r1.projection(variables2));
 
 
     }

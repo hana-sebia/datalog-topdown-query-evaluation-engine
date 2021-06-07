@@ -31,6 +31,14 @@ public class Tuple {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Tuple){
+           return Arrays.equals(elts, ((Tuple) obj).elts);
+        }
+        return false;
+    }
+
+    @Override
     public String toString() {
         return Arrays.toString(elts);
     }

@@ -112,20 +112,23 @@ public class RecursiveQsqEngine {
 
         //sup0
         sup.get(0).tuples.addAll(newInput.tuples);
-
+        int i = 1;
         //sup1 - supn
         for(AdornedAtom atom: rule.getBody()){
             // Case EDB
             if(map.getEdbNames().contains(atom.getAtom().getName())) {
-
+                Relation edb = new Relation(atom.getAtom().getName(), (List<Variable>) atom.getAtom().getVars(), map);
+                //reste la jointure entre sup_i-1 et edb puis projection sur les variables de sup_i
             }
             // Case IDB
             else {
-
+                // faut faire une projection de sup_i-1 sur boundVars de IDB - Input_IDB = S
+                // faut faire Input_IDB = Input_IDB U S
+                // lancer l'appel récursif ou pas
+                // sup_i = sup_i join output_IDB
             }
 
         }
-
         //supn
         state.ans.get(rule.getHead()).tuples.addAll(sup.get(sup.size() - 1).tuples);
 

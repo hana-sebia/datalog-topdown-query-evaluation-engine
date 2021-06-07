@@ -1,11 +1,9 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
+import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 /**
  * @juba BDD
  */
@@ -46,6 +44,14 @@ public class Relation {
         this.attributes = new TermSchema(variables);
         this.tuples = tuples;
 
+    }
+
+    public Relation (final String name, List<Variable> attributes, Mapping map) {
+        this.attributes = new TermSchema(attributes);
+        this.tuples = new ArrayList<>();
+        for(fr.univlyon1.mif37.dex.mapping.Relation r: map.getEDB()) {
+            tuples.add(new Tuple(Arrays.asList(r.getAttributes())));
+        }
     }
 
     public void addTuple(Tuple tuple) {
@@ -103,6 +109,35 @@ public class Relation {
         }
         return join;
     }
+
+    public Relation projection(final List<Variable> varsRelation) {
+        List<Integer> index = new ArrayList<>();
+        int i;
+        for(Variable var: varsRelation) {
+            i = 0;
+            for(Variable v: this.attributes.attributes){
+                if(var.equals(v)){
+                    index.add(i);
+                    break;
+                }
+                i++;
+            }
+        }
+        ArrayList<Tuple> newTuples = new ArrayList<>();
+        for(Tuple tuple: this.tuples) {
+            List<String> values = new ArrayList<>();
+            for(int j = 0; j < index.size(); j++){
+                values.add(tuple.elts[index.get(j)]);
+            }
+            Tuple newTuple = new Tuple(values);
+            if(!newTuples.contains(newTuple)) {
+                newTuples.add(newTuple);
+            }
+        }
+        return new Relation(varsRelation, newTuples);
+    }
+
+
 
     @Override
     public String toString() {
