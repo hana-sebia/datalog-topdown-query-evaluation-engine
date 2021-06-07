@@ -1,6 +1,8 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
 import fr.univlyon1.mif37.dex.mapping.Atom;
+import fr.univlyon1.mif37.dex.mapping.Tgd;
+import fr.univlyon1.mif37.dex.mapping.Variable;
 
 import java.util.*;
 /**
@@ -21,19 +23,19 @@ public class RecursiveQsqEngine {
         /**
          * Tracks the answer tuples generated for each adorned predicate.
          */
-        private Map<Object,Object> ans;
+        private Map<AdornedAtom,Relation> ans;
         /**
          * Tracks which input tuples have been used for each rule.
          */
-        private Map<Object,Object> inputByRule;
+        private Map<AdornedAtom,Relation> inputByRule;
         /**
          * Holds all the adorned rules for a given adorned predicate.
          */
-        private Map<Object,Object> adornedRules;
+        private Map<AdornedAtom, List<AdornedRules>> adornedRules;
         /**
          * Holds all the unadorned rules for a given predicate.
          */
-        private final Map<Object,Object>  unadornedRules;
+        //private final Map<Object,Object>  unadornedRules;
 
 
         /**
@@ -42,13 +44,17 @@ public class RecursiveQsqEngine {
          * @param unadornedRules
          *            set of unadorned rules
          */
-        public QSQRState(Map<Object,Object> unadornedRules) {
-            this.ans = new LinkedHashMap<>();
-            this.inputByRule = new LinkedHashMap<>();
-            this.adornedRules = new LinkedHashMap<>();
-            this.unadornedRules = unadornedRules;
+        public QSQRState(Map<AdornedAtom,List<AdornedRules>> unadornedRules) {
+            this.adornedRules = unadornedRules;
+            this.ans = new HashMap<>();
+            this.inputByRule = new HashMap<>();
 
+            for(Map.Entry<AdornedAtom, List<AdornedRules>> map: adornedRules.entrySet()) {
+                ans.put(map.getKey(), new Relation((List<Variable>) map.getKey().getAtom().getVars()));
+                inputByRule.put(map.getKey(), new Relation(map.getKey().getBoundVariables()));
+            }
         }
+
 
 
     }

@@ -1,6 +1,5 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
-import fr.univlyon1.mif37.dex.mapping.Literal;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
 import java.util.ArrayList;

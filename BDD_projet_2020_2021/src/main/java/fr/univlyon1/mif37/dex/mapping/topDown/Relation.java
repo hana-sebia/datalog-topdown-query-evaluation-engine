@@ -1,5 +1,10 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
+import fr.univlyon1.mif37.dex.mapping.Variable;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 /**
  * @juba BDD
@@ -13,7 +18,7 @@ public class Relation {
     /**
      * The tuples of this relation.
      */
-    protected Set<Tuple> tuples;
+    protected List<Tuple> tuples;
     /**
      * The attribute schema of this relation.
      */
@@ -22,7 +27,13 @@ public class Relation {
     /**
      * Constructs an empty relation
      */
-    public Relation (){
-        // TODO Cluncky
+    public Relation() {
+        this.attributes = new TermSchema(new LinkedList<>());
+        this.tuples = new ArrayList<>();
+    }
+
+    public Relation(List<Variable> variables) {
+        this.attributes = new TermSchema(variables);
+        this.tuples = new ArrayList<>();
     }
 }

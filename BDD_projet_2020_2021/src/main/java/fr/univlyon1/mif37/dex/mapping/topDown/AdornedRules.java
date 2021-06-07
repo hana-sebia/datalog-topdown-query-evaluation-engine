@@ -2,9 +2,7 @@ package fr.univlyon1.mif37.dex.mapping.topDown;
 
 import fr.univlyon1.mif37.dex.mapping.*;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class AdornedRules {
     Collection<AdornedTgd> adornedRules;
@@ -154,5 +152,16 @@ public class AdornedRules {
 
     public ArrayList<AdornedTgd> getAdornedRules() {
         return (ArrayList<AdornedTgd>) adornedRules;
+    }
+
+    public Map<AdornedAtom, List<AdornedTgd>> adornedMap() {
+        Map<AdornedAtom, List<AdornedTgd>> map = new HashMap<>();
+        for(AdornedAtom p: adornedPredicates) {
+            map.put(p, new ArrayList<>());
+        }
+        for(AdornedTgd t : adornedRules){
+            map.get(t.getHead()).add(t);
+        }
+        return map;
     }
 }

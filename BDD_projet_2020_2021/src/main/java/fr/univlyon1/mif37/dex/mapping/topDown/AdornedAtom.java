@@ -1,5 +1,6 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 import fr.univlyon1.mif37.dex.mapping.Atom;
+import fr.univlyon1.mif37.dex.mapping.Variable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,6 +59,17 @@ public class AdornedAtom {
 
     public List<Boolean> getAdornment() {
         return adornment;
+    }
+
+    public List<Variable> getBoundVariables() {
+        List<Variable> boundVars = new ArrayList<>();
+        ArrayList<Variable> vars = (ArrayList<Variable>) atom.getVars();
+        for(int i = 0; i < vars.size(); i++){
+            if(adornment.get(i)){
+                boundVars.add(vars.get(i));
+            }
+        }
+        return boundVars;
     }
 
     public int getBound() {
