@@ -1,6 +1,7 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
 import fr.univlyon1.mif37.dex.mapping.Atom;
+import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Tgd;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
@@ -31,7 +32,7 @@ public class RecursiveQsqEngine {
         /**
          * Holds all the adorned rules for a given adorned predicate.
          */
-        private Map<AdornedAtom, List<AdornedRules>> adornedRules;
+        private Map<AdornedAtom, List<AdornedTgd>> adornedRules;
         /**
          * Holds all the unadorned rules for a given predicate.
          */
@@ -44,20 +45,93 @@ public class RecursiveQsqEngine {
          * @param unadornedRules
          *            set of unadorned rules
          */
-        public QSQRState(Map<AdornedAtom,List<AdornedRules>> unadornedRules) {
+        public QSQRState(Map<AdornedAtom,List<AdornedTgd>> unadornedRules) {
             this.adornedRules = unadornedRules;
             this.ans = new HashMap<>();
             this.inputByRule = new HashMap<>();
 
-            for(Map.Entry<AdornedAtom, List<AdornedRules>> map: adornedRules.entrySet()) {
+            for(Map.Entry<AdornedAtom, List<AdornedTgd>> map: adornedRules.entrySet()) {
                 ans.put(map.getKey(), new Relation((List<Variable>) map.getKey().getAtom().getVars()));
                 inputByRule.put(map.getKey(), new Relation(map.getKey().getBoundVariables()));
             }
         }
+    }
+
+    public RecursiveQsqEngine(Mapping mapping) {
+        AdornedRules adornedRules = new AdornedRules(mapping);
+        QSQRState state = new QSQRState(adornedRules.adornedMap());
+
+        // Step 1 :
+        // Identify the adorned rules with relevant P predicate in the body of the query
+        AdornedAtom query;
+        List<AdornedAtom> body = new ArrayList<>();
+        for(Map.Entry<AdornedAtom, List<AdornedTgd>> rule : state.adornedRules.entrySet()) {
+            if(rule.getKey().getAtom().getName().equals("query")) {
+                query = rule.getKey();
+                body = rule.getValue().get(0).getBody();
+            }
+        }
+
+        List<Variable> cstAttributes = (List<Variable>) body.get(0).getAtom().getVars();
+        List<Tuple>  cstTuples = new ArrayList<>();
+        for(fr.univlyon1.mif37.dex.mapping.Relation r : mapping.getEDB()) {
+            if(r.getName().equals("cst")){
+                cstTuples.add(new Tuple(Arrays.asList(r.getAttributes())));
+            }
+        }
+        // Calculate Input_Predicate
+        AdornedAtom predicate = body.get(1);
+        state.inputByRule.replace(predicate, new Relation(cstAttributes, cstTuples));
+
+        for(AdornedTgd rule : state.adornedRules.get(predicate)){
+            // Appel récursif
+        }
+
+        // Projection of Output_predicate on query's variables
+
+        // return the result
+    }
 
 
+    /**
+     * Evaluates the supplied rule using the input tuples newInput.
+     *
+     * @param rule
+     *            rule
+     * @param newInput
+     *            input tuples
+     * @param state
+     *            current state of evaluation-wide variables
+     */
+    private void qsqrSubroutine(AdornedTgd rule, Relation newInput, QSQRState state, Mapping map) {
+        QsqTemplate qsqTemplate = new QsqTemplate(rule);
+        List<Relation> sup = new ArrayList<>();
+        for(TermSchema t: qsqTemplate.getSchemata()) {
+            sup.add(new Relation(t));
+        }
+
+        //sup0
+        sup.get(0).tuples.addAll(newInput.tuples);
+
+        //sup1 - supn
+        for(AdornedAtom atom: rule.getBody()){
+            // Case EDB
+            if(map.getEdbNames().contains(atom.getAtom().getName())) {
+
+            }
+            // Case IDB
+            else {
+
+            }
+
+        }
+
+        //supn
+        state.ans.get(rule.getHead()).tuples.addAll(sup.get(sup.size() - 1).tuples);
 
     }
+
+
 
     /**
      *
@@ -87,19 +161,6 @@ public class RecursiveQsqEngine {
 
     }
 
-    /**
-     * Evaluates the supplied rule using the input tuples newInput.
-     *
-     * @param rule
-     *            rule
-     * @param newInput
-     *            input tuples
-     * @param state
-     *            current state of evaluation-wide variables
-     */
-    private void qsqrSubroutine(AdornedTgd rule, Relation newInput, QSQRState state) {
 
-
-    }
 
 }

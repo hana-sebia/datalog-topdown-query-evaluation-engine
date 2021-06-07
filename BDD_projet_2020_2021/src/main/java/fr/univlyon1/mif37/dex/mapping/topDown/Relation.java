@@ -36,4 +36,80 @@ public class Relation {
         this.attributes = new TermSchema(variables);
         this.tuples = new ArrayList<>();
     }
+
+    public Relation(TermSchema termSchema) {
+        this.attributes = termSchema;
+        this.tuples = new ArrayList<>();
+    }
+
+    public Relation(List<Variable> variables, List<Tuple> tuples) {
+        this.attributes = new TermSchema(variables);
+        this.tuples = tuples;
+
+    }
+
+    public void addTuple(Tuple tuple) {
+        this.tuples.add(tuple);
+    }
+
+    public Relation join(final Relation relation) {
+        List<Variable> commonVariables = new ArrayList<>();
+        List<Integer> index1 = new ArrayList<>();
+        List<Integer> index2 = new ArrayList<>();
+        for (Variable v1 : this.attributes.attributes) {
+            commonVariables.add(v1);
+            for (Variable v2 : relation.attributes.attributes) {
+                if (!this.attributes.attributes.contains(v2)) {
+                    commonVariables.add(v2);
+                }
+                if (v1.equals(v2)) {
+                    index1.add(this.attributes.attributes.indexOf(v1));
+                    index2.add(relation.attributes.attributes.indexOf(v2));
+                }
+            }
+        }
+        if (commonVariables.size() == 0) {
+            return null;
+        }
+        Relation join = new Relation(new TermSchema(commonVariables));
+        List<String> newElements = new ArrayList<>();
+        int i;
+        List<Integer> toRemove = new ArrayList<>();
+        for (Tuple t1 : this.tuples) {
+            for (Tuple t2 : relation.tuples) {
+                newElements.clear();
+                toRemove.clear();
+                for (Integer i1 : index1) {
+                    for (Integer i2 : index2) {
+                        if (t1.elts[i1].equals(t2.elts[i2])) {
+                            toRemove.add(i2);
+                            System.out.println(t1.elts[i1]);
+                        }
+                        System.out.println();
+                    }
+                }
+                if (toRemove.size() > 0 && toRemove.size() == commonVariables.size()) {
+                    for (i = 0; i < t1.elts.length; i++) {
+                        newElements.add(t1.elts[i]);
+                    }
+                    for (i = 0; i < t2.elts.length; i++) {
+                        if (!toRemove.contains(i)) {
+                            newElements.add(t2.elts[i]);
+                        }
+                    }
+                }
+                join.addTuple(new Tuple(newElements));
+            }
+        }
+        return join;
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        for(Tuple t : tuples) {
+            str += t.toString() + "\n";
+        }
+        return str;
+    }
 }

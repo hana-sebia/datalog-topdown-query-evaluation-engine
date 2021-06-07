@@ -83,4 +83,7 @@ public class QsqTemplate {
         return str;
     }
 
+    public List<TermSchema> getSchemata() {
+        return schemata;
+    }
 }
