@@ -57,12 +57,9 @@ public class Relation {
         List<Integer> index1 = new ArrayList<>();
         List<Integer> index2 = new ArrayList<>();
         for (Variable v1 : this.attributes.attributes) {
-            commonVariables.add(v1);
             for (Variable v2 : relation.attributes.attributes) {
-                if (!this.attributes.attributes.contains(v2)) {
-                    commonVariables.add(v2);
-                }
                 if (v1.equals(v2)) {
+                    commonVariables.add(v2);
                     index1.add(this.attributes.attributes.indexOf(v1));
                     index2.add(relation.attributes.attributes.indexOf(v2));
                 }
@@ -71,29 +68,39 @@ public class Relation {
         if (commonVariables.size() == 0) {
             return null;
         }
-        Relation join = new Relation(new TermSchema(commonVariables));
+
+        List<Variable> newVariables = new ArrayList<>();
+        for (Variable v1 : this.attributes.attributes) {
+            newVariables.add(v1);
+        }
+        for (Variable v2 : relation.attributes.attributes) {
+            if (!newVariables.contains(v2)) {
+                newVariables.add(v2);
+            }
+        }
+        Relation join = new Relation(new TermSchema(newVariables));
         List<String> newElements = new ArrayList<>();
         int i;
         List<Integer> toRemove = new ArrayList<>();
+        boolean toJoin;
         for (Tuple t1 : this.tuples) {
             for (Tuple t2 : relation.tuples) {
                 newElements.clear();
                 toRemove.clear();
-                for (Integer i1 : index1) {
-                    for (Integer i2 : index2) {
-                        if (t1.elts[i1].equals(t2.elts[i2])) {
-                            toRemove.add(i2);
-                            System.out.println(t1.elts[i1]);
-                        }
-                        System.out.println();
+                toJoin = true;
+                for (i = 0; i < index1.size(); i++) {
+                    if (!t1.elts[index1.get(i)].equals(t2.elts[index2.get(i)])) {
+                        toJoin = false;
                     }
                 }
-                if (toRemove.size() > 0 && toRemove.size() == commonVariables.size()) {
+
+                if (toJoin) {
+                    System.out.println("joining  " + t1 + " & " + t2);
                     for (i = 0; i < t1.elts.length; i++) {
                         newElements.add(t1.elts[i]);
                     }
                     for (i = 0; i < t2.elts.length; i++) {
-                        if (!toRemove.contains(i)) {
+                        if (!index2.contains(i)) {
                             newElements.add(t2.elts[i]);
                         }
                     }
@@ -104,11 +111,40 @@ public class Relation {
         return join;
     }
 
+
+    /**
+     * substraction
+     * @param otherRelation to subtract to 'this'
+     * Precondition : this and otherRelation have similar attributes
+     */
+    public Relation substract(final Relation otherRelation) {
+        if (otherRelation.attributes.attributes.size() != this.attributes.attributes.size()) {
+            return null;
+        }
+        int i;
+        boolean toAdd;
+        List<Tuple> newTuples = new ArrayList<>();
+        for (Tuple t1 : this.tuples) {
+            toAdd = false;
+            for (Tuple t2 : otherRelation.tuples) {
+                for  (i = 0; i < this.attributes.attributes.size(); i++) {
+                    if (!t1.elts[i].equals(t2.elts[i])) {
+                        toAdd = true;
+                    }
+                }
+            }
+            if(toAdd) {
+                newTuples.add(t1);
+            }
+        }
+        return new Relation(this.attributes.attributes, newTuples);
+    }
+
     @Override
     public String toString() {
-        String str = "";
+        String str = this.attributes.attributes.toString() + " -> ";
         for(Tuple t : tuples) {
-            str += t.toString() + "\n";
+            str += t.toString() + " ; ";
         }
         return str;
     }
