@@ -11,16 +11,19 @@ public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws Exception {
-        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple2.txt"));
+        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple3.txt"));
         Mapping mapping = mp.mapping();
+
         LOG.info("\n"+mapping.toString());
         LOG.info("Parsed {} edb(s), {} idb(s) and {} tgd(s).",
                 mapping.getEDB().size(),
                 mapping.getIDB().size(),
                 mapping.getTgds().size());
 
+        long begin = System.currentTimeMillis();
         RecursiveQsqEngine rs = new RecursiveQsqEngine(mapping);
-        System.out.println("\n" + rs.result.toStringAsResult() + "\n");
+        long end = System.currentTimeMillis();
+        System.out.println("\n" + rs.result.toStringAsResult(end - begin) + "\n");
 
     }
 }

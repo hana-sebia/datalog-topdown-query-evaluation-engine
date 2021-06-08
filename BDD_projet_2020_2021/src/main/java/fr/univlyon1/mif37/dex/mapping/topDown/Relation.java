@@ -184,16 +184,16 @@ public class Relation {
         return str;
     }
 
-    public String toStringAsResult() {
+    public String toStringAsResult(final long elapsedTime) {
         if (this.tuples.size() == 0) {
-            return "No match";
+            return "No match found";
         }
         String res = "";
         if (this.tuples.size() > 1) {
-            res = this.tuples.size() + " matches : \n";
+            res = this.tuples.size() + " matches : (found on " + elapsedTime + " ms)\n";
         }
         else {
-            res = "Single match : \n";
+            res = "Single match : (found on " + elapsedTime + " ms)\n";
         }
         String str = "(";
         for (Variable v : this.attributes.attributes) {
