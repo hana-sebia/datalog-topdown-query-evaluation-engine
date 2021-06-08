@@ -37,7 +37,10 @@ public class RecursiveQsqEngine {
         /**
          * Holds all the unadorned rules for a given predicate.
          */
-        //private final Map<Object,Object>  unadornedRules;
+        private int ansCount;
+
+        private int inputCount;
+
 
 
         /**
@@ -50,12 +53,41 @@ public class RecursiveQsqEngine {
             this.adornedRules = adornedRules;
             this.ans = new HashMap<>();
             this.inputByRule = new HashMap<>();
+            this.ansCount = 0;
+            this.inputCount = 0;
 
             for(Map.Entry<AdornedAtom, List<AdornedTgd>> map: adornedRules.entrySet()) {
                 ans.put(map.getKey(), new Relation((List<Variable>) map.getKey().getAtom().getVars()));
                 inputByRule.put(map.getKey(), new Relation(map.getKey().getBoundVariables()));
             }
         }
+
+
+        public boolean compareTo(final Map<AdornedAtom,Relation> ans2,
+                                 final Map<AdornedAtom,Relation> inputByRule2) {
+            if (this.ans.size() != ans2.size()
+                || this.inputByRule.size() != inputByRule2.size()) {
+                return false;
+            }
+            for (Map.Entry<AdornedAtom, Relation> mp1 : this.ans.entrySet()) {
+                if (ans2.get(mp1.getKey()) == null) {
+                    return false;
+                }
+                else if (!ans2.get(mp1.getKey()).equals(mp1.getValue())) {
+                    return false;
+                }
+            }
+            for (Map.Entry<AdornedAtom, Relation> mp1 : this.inputByRule.entrySet()) {
+                if (inputByRule2.get(mp1.getKey()) == null) {
+                    return false;
+                }
+                else if (!inputByRule2.get(mp1.getKey()).equals(mp1.getValue())) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
 
     }
 
@@ -84,12 +116,23 @@ public class RecursiveQsqEngine {
         // Calculate Input_Predicate
         AdornedAtom predicate = body.get(1);
         state.inputByRule.replace(predicate, new Relation(cstAttributes, cstTuples));
+        state.inputCount += cstTuples.size();
 
-        for(AdornedTgd rule : state.adornedRules.get(predicate)){
-            //System.out.println(rule);
-            qsqrSubroutine(rule, state.inputByRule.get(predicate), state, mapping);
-        }
-        //System.out.println(state.ans.get(predicate));
+        int inputCountCopy;
+        int ansCountCopy;
+        int index = 1;
+        do {
+            inputCountCopy = state.inputCount;
+            ansCountCopy = state.ansCount;
+            for(AdornedTgd rule : state.adornedRules.get(predicate)){
+                //System.out.println(rule);
+                qsqrSubroutine(rule, state.inputByRule.get(predicate), state, mapping);
+            }
+
+            index++;
+        } while (ansCountCopy != state.ansCount || inputCountCopy != state.inputCount);
+
+        System.out.println("do " + index + " fois");
         // Projection of Output_predicate on query's variables
         result = state.ans.get(predicate).projection((List<Variable>) query.getAtom().getVars());
         // return the result
@@ -146,17 +189,18 @@ public class RecursiveQsqEngine {
                 // faut faire Input_IDB = Input_IDB U S
                 if(!s.tuples.isEmpty()) {
                     state.inputByRule.get(atom).tuples.addAll(s.tuples);
+                    state.inputCount += s.tuples.size();
                     System.out.println(state.inputByRule.get(atom));
-                    //System.exit(0);
+
                     for(AdornedTgd r:state.adornedRules.get(atom)){
                         // lancer l'appel récursif
-                        /*long startTime = System.nanoTime() / 1000000;
+                        long startTime = System.nanoTime() / 1000000;
                         long endTime = System.nanoTime() / 1000000;
                         while(startTime < endTime + 5000) {
                             startTime = System.nanoTime() / 1000000;
-                        }*/
+                        }
                         System.out.println("--------------------------------------");
-                        qsqrSubroutine(rule, state.inputByRule.get(atom), state, map);
+                        qsqrSubroutine(r, state.inputByRule.get(atom), state, map);
                     }
                 }
                 // sup_i = sup_i join output_IDB
@@ -167,40 +211,14 @@ public class RecursiveQsqEngine {
         }
 
         //supn
-        state.ans.get(rule.getHead()).tuples.addAll(sup.get(sup.size()-1).tuples);
+        state.ansCount -= state.ans.get(rule.getHead()).tuples.size();
+        for(Tuple t : sup.get(sup.size()-1).tuples) {
+            if(!state.ans.get(rule.getHead()).tuples.contains(t)) {
+                state.ans.get(rule.getHead()).tuples.add(t);
+            }
+        }
+        state.ansCount += state.ans.get(rule.getHead()).tuples.size();
 
     }
-
-
-
-    /**
-     *
-     *
-     * Preparation of query q and retun the obtained result
-     *
-     *
-    **/
-
-    public Set<Object> query(Atom q) {
-        Set<Object> result = new LinkedHashSet<>();
-        return result;
-    }
-
-    /**
-     * Evaluates the query represented by the adorned predicate p and the
-     * relation newInput.
-     *
-     * @param p
-     *            adorned predicate of query
-     * @param newInput
-     *            input tuples
-     * @param state
-     *            current state of evaluation-wide variables
-     */
-    private void qsqr(AdornedAtom p, Relation newInput, QSQRState state) {
-
-    }
-
-
 
 }
