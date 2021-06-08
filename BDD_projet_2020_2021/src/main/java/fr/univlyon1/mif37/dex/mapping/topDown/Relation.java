@@ -178,6 +178,49 @@ public class Relation {
         return new Relation(this.attributes.attributes, newTuples);
     }
 
+    public Relation cartesianProduct(Relation otherRelation) {
+        if (otherRelation == null) {
+            return new Relation(this.attributes.attributes, this.tuples);
+        }
+        if (this.tuples.size() == 0) {
+            if (otherRelation.tuples.size() == 0) {
+                return null;
+            }
+            else {
+                return otherRelation;
+            }
+        }
+        else if (otherRelation.tuples.size() == 0) {
+            return new Relation(this.attributes.attributes, this.tuples);
+        }
+
+        List<Variable> newVariables = new ArrayList<>();
+        List<Tuple> newTuples = new ArrayList<>();
+        List<String> e1 = new ArrayList<>();
+        List<String> e2 = new ArrayList<>();
+        int i;
+
+        newVariables.addAll(this.attributes.attributes);
+        newVariables.addAll(otherRelation.attributes.attributes);
+
+        for (Tuple t1 : this.tuples) {
+            e1.clear();
+            for (i = 0; i < t1.elts.length; i++) {
+                e1.add(t1.elts[i]);
+            }
+            for (Tuple t2 : otherRelation.tuples) {
+                e2.clear();
+                for (i = 0; i < t1.elts.length; i++) {
+                    e2.add(t1.elts[i]);
+                }
+                for (i = 0; i < t2.elts.length; i++) {
+                    e2.add(t2.elts[i]);
+                }
+                newTuples.add(new Tuple(e2));
+            }
+        }
+        return new Relation(newVariables, newTuples);
+    }
 
     @Override
     public String toString() {

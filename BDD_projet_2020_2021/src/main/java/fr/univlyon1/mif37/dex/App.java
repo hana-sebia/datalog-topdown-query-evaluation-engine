@@ -78,30 +78,30 @@ public class App {
 
         List<Variable> variables1 = new ArrayList<>();
         variables1.add(x);
-        //variables1.add(y);
-        //variables1.add(z);
+        variables1.add(y);
+        variables1.add(z);
 
         List<Variable> variables2 = new ArrayList<>();
         variables2.add(w);
-        variables2.add(z);
-        //variables2.add(z);
+        variables2.add(y);
+        variables2.add(t);
 
         List<Tuple> t1 = new ArrayList<>();
         t1.add(new Tuple(Arrays.asList(e1)));
-        //t1.add(new Tuple(Arrays.asList(e3)));
+        t1.add(new Tuple(Arrays.asList(e3)));
 
         List<Tuple> t2 = new ArrayList<>();
         t2.add(new Tuple(Arrays.asList(e2)));
-        //t2.add(new Tuple(Arrays.asList(e4)));
+        t2.add(new Tuple(Arrays.asList(e4)));
 
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r1 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables1, t1);
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r2 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables2, t2);
 
         System.out.println(r1);
-        System.out.println(" - ");
+        System.out.println(" * ");
         System.out.println(r2);
         System.out.println("=");
-        System.out.println(r1.substract(r2));*/
+        System.out.println(r1.cartesianProduct(r2));*/
 
 
     }
