@@ -50,7 +50,9 @@ public class Relation {
         this.attributes = new TermSchema(attributes);
         this.tuples = new ArrayList<>();
         for(fr.univlyon1.mif37.dex.mapping.Relation r: map.getEDB()) {
-            tuples.add(new Tuple(Arrays.asList(r.getAttributes())));
+            if(r.getName().equals(name)) {
+                tuples.add(new Tuple(Arrays.asList(r.getAttributes())));
+            }
         }
     }
 
@@ -111,7 +113,9 @@ public class Relation {
                         }
                     }
                 }
-                join.addTuple(new Tuple(newElements));
+                if (!newElements.isEmpty()) {
+                    join.addTuple(new Tuple(newElements));
+                }
             }
         }
         return join;
@@ -159,15 +163,15 @@ public class Relation {
         boolean toAdd;
         List<Tuple> newTuples = new ArrayList<>();
         for (Tuple t1 : this.tuples) {
-            toAdd = false;
+            /*toAdd = false;
             for (Tuple t2 : otherRelation.tuples) {
                 for  (i = 0; i < this.attributes.attributes.size(); i++) {
                     if (!t1.elts[i].equals(t2.elts[i])) {
                         toAdd = true;
                     }
                 }
-            }
-            if(toAdd) {
+            }*/
+            if(!otherRelation.tuples.contains(t1)) {
                 newTuples.add(t1);
             }
         }

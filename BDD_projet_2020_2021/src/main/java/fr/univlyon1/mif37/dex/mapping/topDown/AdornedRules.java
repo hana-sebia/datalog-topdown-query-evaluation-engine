@@ -27,6 +27,7 @@ public class AdornedRules {
                     }
                 }
                 AdornedAtom adornedHead = new AdornedAtom(t.getRight(), booleans);
+                adornedPredicates.add(adornedHead);
                 // Pour chaque literal de la query je calcule l'ornement
                 Literal l;
                 for(int i = 0; i < t.getLeft().size(); i++){
@@ -157,11 +158,15 @@ public class AdornedRules {
     public Map<AdornedAtom, List<AdornedTgd>> adornedMap() {
         Map<AdornedAtom, List<AdornedTgd>> map = new HashMap<>();
         for(AdornedAtom p: adornedPredicates) {
-            map.put(p, new ArrayList<>());
+            ArrayList<AdornedTgd> tgd = new ArrayList<>();
+            for(AdornedTgd t : adornedRules) {
+                if(t.getHead().equals(p)) {
+                    tgd.add(t);
+                }
+            }
+            map.put(p, tgd);
         }
-        for(AdornedTgd t : adornedRules){
-            map.get(t.getHead()).add(t);
-        }
+
         return map;
     }
 }

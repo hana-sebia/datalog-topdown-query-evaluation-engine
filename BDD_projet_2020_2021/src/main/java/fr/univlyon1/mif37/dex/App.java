@@ -28,14 +28,21 @@ public class App {
                 mapping.getTgds().size());
 
 
-        /*AdornedRules adornedRules = new AdornedRules(mapping);
+        AdornedRules adornedRules = new AdornedRules(mapping);
         System.out.println(adornedRules.toString());
         ArrayList<AdornedTgd> rules = adornedRules.getAdornedRules();
-        QsqTemplate qsqTemplate = new QsqTemplate(rules.get(1));
-        System.out.println(qsqTemplate.toString());*/
+        QsqTemplate qsqTemplate = new QsqTemplate(rules.get(0));
+        System.out.println(qsqTemplate.toString());
+
+        RecursiveQsqEngine rs = new RecursiveQsqEngine(mapping);
+        System.out.println(rs.result);
+        System.out.print("\nPlease commit...");
 
 
-        String[] e1 = new String[3];
+
+
+
+        /*String[] e1 = new String[3];
         e1[0] = "a";
         e1[1] = "b";
         e1[2] = "c";
@@ -55,6 +62,13 @@ public class App {
         e4[1] = "b";
         e4[2] = "b";
 
+        String[] e1 = new String[1];
+        e1[0] = "Perrache";
+
+        String[] e2 = new String[2];
+        e2[0] = "Charpennes";
+        e2[1] = "Perrache";
+
 
         Variable x = new Variable("x");
         Variable y = new Variable("y");
@@ -64,27 +78,30 @@ public class App {
 
         List<Variable> variables1 = new ArrayList<>();
         variables1.add(x);
-        variables1.add(y);
-        variables1.add(z);
+        //variables1.add(y);
+        //variables1.add(z);
 
         List<Variable> variables2 = new ArrayList<>();
         variables2.add(w);
-        //variables2.add(z);
+        variables2.add(z);
         //variables2.add(z);
 
         List<Tuple> t1 = new ArrayList<>();
         t1.add(new Tuple(Arrays.asList(e1)));
-        t1.add(new Tuple(Arrays.asList(e3)));
+        //t1.add(new Tuple(Arrays.asList(e3)));
 
         List<Tuple> t2 = new ArrayList<>();
         t2.add(new Tuple(Arrays.asList(e2)));
-        t2.add(new Tuple(Arrays.asList(e4)));
+        //t2.add(new Tuple(Arrays.asList(e4)));
 
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r1 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables1, t1);
         fr.univlyon1.mif37.dex.mapping.topDown.Relation r2 = new fr.univlyon1.mif37.dex.mapping.topDown.Relation(variables2, t2);
 
-        //Relation join = r1.join(r2);
-        System.out.println(r1.projection(variables2));
+        System.out.println(r1);
+        System.out.println(" - ");
+        System.out.println(r2);
+        System.out.println("=");
+        System.out.println(r1.substract(r2));*/
 
 
     }

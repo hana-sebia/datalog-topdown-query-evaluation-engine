@@ -15,6 +15,7 @@ import java.util.*;
  *
  */
 public class RecursiveQsqEngine {
+    public Relation result;
     /**
      * A container for tracking global information passed back and forth between
      * recursion frames.
@@ -42,11 +43,11 @@ public class RecursiveQsqEngine {
         /**
          * Initializes state with a set of all unadorned rules for the program.
          *
-         * @param unadornedRules
+         * @param adornedRules
          *            set of unadorned rules
          */
-        public QSQRState(Map<AdornedAtom,List<AdornedTgd>> unadornedRules) {
-            this.adornedRules = unadornedRules;
+        public QSQRState(Map<AdornedAtom,List<AdornedTgd>> adornedRules) {
+            this.adornedRules = adornedRules;
             this.ans = new HashMap<>();
             this.inputByRule = new HashMap<>();
 
@@ -55,6 +56,7 @@ public class RecursiveQsqEngine {
                 inputByRule.put(map.getKey(), new Relation(map.getKey().getBoundVariables()));
             }
         }
+
     }
 
     public RecursiveQsqEngine(Mapping mapping) {
@@ -63,7 +65,7 @@ public class RecursiveQsqEngine {
 
         // Step 1 :
         // Identify the adorned rules with relevant P predicate in the body of the query
-        AdornedAtom query;
+        AdornedAtom query = null;
         List<AdornedAtom> body = new ArrayList<>();
         for(Map.Entry<AdornedAtom, List<AdornedTgd>> rule : state.adornedRules.entrySet()) {
             if(rule.getKey().getAtom().getName().equals("query")) {
@@ -84,11 +86,12 @@ public class RecursiveQsqEngine {
         state.inputByRule.replace(predicate, new Relation(cstAttributes, cstTuples));
 
         for(AdornedTgd rule : state.adornedRules.get(predicate)){
-            // Appel récursif
+            //System.out.println(rule);
+            qsqrSubroutine(rule, state.inputByRule.get(predicate), state, mapping);
         }
-
+        //System.out.println(state.ans.get(predicate));
         // Projection of Output_predicate on query's variables
-
+        result = state.ans.get(predicate).projection((List<Variable>) query.getAtom().getVars());
         // return the result
     }
 
@@ -104,6 +107,9 @@ public class RecursiveQsqEngine {
      *            current state of evaluation-wide variables
      */
     private void qsqrSubroutine(AdornedTgd rule, Relation newInput, QSQRState state, Mapping map) {
+        System.out.println("rule : " + rule);
+        System.out.println(newInput);
+
         QsqTemplate qsqTemplate = new QsqTemplate(rule);
         List<Relation> sup = new ArrayList<>();
         for(TermSchema t: qsqTemplate.getSchemata()) {
@@ -112,25 +118,56 @@ public class RecursiveQsqEngine {
 
         //sup0
         sup.get(0).tuples.addAll(newInput.tuples);
+        System.out.println(sup.get(0));
         int i = 1;
         //sup1 - supn
         for(AdornedAtom atom: rule.getBody()){
             // Case EDB
             if(map.getEdbNames().contains(atom.getAtom().getName())) {
+                System.out.println("je suis un EDB");
                 Relation edb = new Relation(atom.getAtom().getName(), (List<Variable>) atom.getAtom().getVars(), map);
+                System.out.println(edb);
                 //reste la jointure entre sup_i-1 et edb puis projection sur les variables de sup_i
+                Relation result= edb.join(sup.get(i-1)).projection(sup.get(i).attributes.attributes);
+                System.out.println(result);
+                sup.get(i).tuples.addAll(result.tuples);
+                System.out.println(sup.get(i));
             }
             // Case IDB
             else {
                 // faut faire une projection de sup_i-1 sur boundVars de IDB - Input_IDB = S
-                // faut faire Input_IDB = Input_IDB U S
-                // lancer l'appel récursif ou pas
-                // sup_i = sup_i join output_IDB
-            }
+                System.out.println("sup i-1 : " + sup.get(i-1));
+                System.out.println("bound variables of predicate : " + atom.getBoundVariables());
+                System.out.println("sup i-1 projection on bound : " + sup.get(i-1).projection(atom.getBoundVariables()));
+                System.out.println("input_predicate : " + state.inputByRule.get(atom));
+                Relation s = sup.get(i-1).projection(atom.getBoundVariables()).substract(state.inputByRule.get(atom));
+                System.out.println(sup.get(i-1).projection(atom.getBoundVariables()) + " - " + state.inputByRule.get(atom) + " = " + s);
 
+                // faut faire Input_IDB = Input_IDB U S
+                if(!s.tuples.isEmpty()) {
+                    state.inputByRule.get(atom).tuples.addAll(s.tuples);
+                    System.out.println(state.inputByRule.get(atom));
+                    //System.exit(0);
+                    for(AdornedTgd r:state.adornedRules.get(atom)){
+                        // lancer l'appel récursif
+                        /*long startTime = System.nanoTime() / 1000000;
+                        long endTime = System.nanoTime() / 1000000;
+                        while(startTime < endTime + 5000) {
+                            startTime = System.nanoTime() / 1000000;
+                        }*/
+                        System.out.println("--------------------------------------");
+                        qsqrSubroutine(rule, state.inputByRule.get(atom), state, map);
+                    }
+                }
+                // sup_i = sup_i join output_IDB
+                Relation sup_i = sup.get(i-1).join(state.ans.get(atom).projection(sup.get(i).attributes.attributes));
+                sup.get(i).tuples.addAll(sup_i.tuples);
+            }
+            i++;
         }
+
         //supn
-        state.ans.get(rule.getHead()).tuples.addAll(sup.get(sup.size() - 1).tuples);
+        state.ans.get(rule.getHead()).tuples.addAll(sup.get(sup.size()-1).tuples);
 
     }
 

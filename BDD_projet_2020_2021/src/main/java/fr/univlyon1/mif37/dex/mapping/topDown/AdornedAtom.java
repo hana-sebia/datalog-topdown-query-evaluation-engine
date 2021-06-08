@@ -79,10 +79,31 @@ public class AdornedAtom {
     @Override
     public boolean equals (Object o) {
         if(o instanceof AdornedAtom){
-            boolean b;
-            return (((AdornedAtom) o).adornment.equals(adornment) && ((AdornedAtom) o).atom.equals(atom));
+            if (((AdornedAtom) o).atom.equals(atom)) {
+                for (int i = 0; i < this.adornment.size(); i++) {
+                    if (!this.adornment.get(i).equals(((AdornedAtom) o).adornment.get(i))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        if(this.adornment == null)
+            return 0;
+        int sum = 0;
+        for(boolean b : this.adornment){
+            if(b)
+                sum++;
+        }
+        return 31+sum;
     }
 
     @Override
