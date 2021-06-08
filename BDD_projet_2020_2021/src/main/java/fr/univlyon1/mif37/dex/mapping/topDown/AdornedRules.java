@@ -1,8 +1,17 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
 
-import fr.univlyon1.mif37.dex.mapping.*;
+import fr.univlyon1.mif37.dex.mapping.Constant;
+import fr.univlyon1.mif37.dex.mapping.Literal;
+import fr.univlyon1.mif37.dex.mapping.Mapping;
+import fr.univlyon1.mif37.dex.mapping.Tgd;
+import fr.univlyon1.mif37.dex.mapping.Value;
+import fr.univlyon1.mif37.dex.mapping.Variable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class AdornedRules {
     Collection<AdornedTgd> adornedRules;
@@ -18,7 +27,6 @@ public class AdornedRules {
         List<Boolean> booleans = new ArrayList<>();
         List<String> knownVars = new ArrayList<>();
         List<AdornedAtom> body = new ArrayList<>();
-
         for(Tgd t: map.getTgds()){
             if (t.getRight().getName().equals("query")) {
                 for (Value v : t.getRight().getArgs()) {

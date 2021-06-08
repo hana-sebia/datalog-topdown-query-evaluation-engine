@@ -1,28 +1,18 @@
 EDB
-flat(g,f)
-flat(m,n)
-flat(m,o)
-flat(p,m)
-up(a,e)
-up(a,f)
-up(f,m)
-up(g,n)
-up(h,n)
-up(i,o)
-up(j,o)
-down(l,f)
-down(m,f)
-down(g,b)
-down(h,c)
-down(i,d)
-down(p,k)
-cst(a)
+link(Charpennes,Perrache)
+link(PartDieu,Charpennes)
+link(Debourg,PartDieu)
+link(PartDieu,Debourg)
+cst(PartDieu)
 
 IDB
-rsg($x,$y)
+metro($x)
+reachable($x,$y)
 query($y)
 
 MAPPING
-flat($x,$y) -> rsg($x,$y).
-up($x,$v),rsg($u,$v),down($u,$y) -> rsg ($x,$y).
-cst($x),rsg($x,$y) -> query($y).
+link($x,$y) -> metro($x).
+link($x,$y) -> metro($y).
+link($x,$y) -> reachable($x,$y).
+link($x,$z),reachable($z,$y) -> reachable($x,$y).
+cst($x),reachable($x,$y) -> query($y).

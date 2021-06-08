@@ -27,10 +27,18 @@ public class AdornedTgd {
         this.body = body;
     }
 
+    /**
+     * Get.
+     * @return AdornedTgd's head
+     */
     public AdornedAtom getHead() {
         return head;
     }
 
+    /**
+     * Get.
+     * @return AdornedTgd's body
+     */
     public List<AdornedAtom> getBody() {
         return body;
     }

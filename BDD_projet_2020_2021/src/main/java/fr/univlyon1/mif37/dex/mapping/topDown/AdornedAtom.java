@@ -40,7 +40,6 @@ public class AdornedAtom {
      *            adornment
      */
     public AdornedAtom(Atom atom, List<Boolean> adornment) {
-        //DONE-begin
         this.atom = atom;
         this.adornment = new ArrayList<>();
         this.bound = 0;
@@ -50,17 +49,28 @@ public class AdornedAtom {
                 this.bound++;
             }
         }
-        //DONE-end
     }
 
+    /**
+     * Get.
+     * @return AdornedAtom's Atom
+     */
     public Atom getAtom() {
         return atom;
     }
 
+    /**
+     * Get.
+     * @return List<Boolean>: True if the variable is 'bound', False for free variable
+     */
     public List<Boolean> getAdornment() {
         return adornment;
     }
 
+    /**
+     * Get bound Variables.
+     * @return List<Variable> bound variables only.
+     */
     public List<Variable> getBoundVariables() {
         List<Variable> boundVars = new ArrayList<>();
         ArrayList<Variable> vars = (ArrayList<Variable>) atom.getVars();
@@ -70,10 +80,6 @@ public class AdornedAtom {
             }
         }
         return boundVars;
-    }
-
-    public int getBound() {
-        return bound;
     }
 
     @Override

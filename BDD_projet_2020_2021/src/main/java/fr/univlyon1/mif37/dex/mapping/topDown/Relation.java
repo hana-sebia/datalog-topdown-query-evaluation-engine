@@ -3,7 +3,10 @@ package fr.univlyon1.mif37.dex.mapping.topDown;
 import fr.univlyon1.mif37.dex.mapping.Mapping;
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 /**
  * @juba BDD
  */
@@ -56,20 +59,29 @@ public class Relation {
         }
     }
 
+    /**
+     * Add tuple to relation (this).
+     * @param tuple tuple to add.
+     */
     public void addTuple(Tuple tuple) {
         this.tuples.add(tuple);
     }
 
-    public Relation join(final Relation relation) {
+    /**
+     * Theta joins.
+     * @param otherRelation relation to join with this.
+     * @return Relation (this JOIN otherRelation)
+     */
+    public Relation join(final Relation otherRelation) {
         List<Variable> commonVariables = new ArrayList<>();
         List<Integer> index1 = new ArrayList<>();
         List<Integer> index2 = new ArrayList<>();
         for (Variable v1 : this.attributes.attributes) {
-            for (Variable v2 : relation.attributes.attributes) {
+            for (Variable v2 : otherRelation.attributes.attributes) {
                 if (v1.equals(v2)) {
                     commonVariables.add(v2);
                     index1.add(this.attributes.attributes.indexOf(v1));
-                    index2.add(relation.attributes.attributes.indexOf(v2));
+                    index2.add(otherRelation.attributes.attributes.indexOf(v2));
                 }
             }
         }
@@ -77,11 +89,8 @@ public class Relation {
             return null;
         }
 
-        List<Variable> newVariables = new ArrayList<>();
-        for (Variable v1 : this.attributes.attributes) {
-            newVariables.add(v1);
-        }
-        for (Variable v2 : relation.attributes.attributes) {
+        List<Variable> newVariables = new ArrayList<>(this.attributes.attributes);
+        for (Variable v2 : otherRelation.attributes.attributes) {
             if (!newVariables.contains(v2)) {
                 newVariables.add(v2);
             }
@@ -89,12 +98,10 @@ public class Relation {
         Relation join = new Relation(new TermSchema(newVariables));
         List<String> newElements = new ArrayList<>();
         int i;
-        List<Integer> toRemove = new ArrayList<>();
         boolean toJoin;
         for (Tuple t1 : this.tuples) {
-            for (Tuple t2 : relation.tuples) {
+            for (Tuple t2 : otherRelation.tuples) {
                 newElements.clear();
-                toRemove.clear();
                 toJoin = true;
                 for (i = 0; i < index1.size(); i++) {
                     if (!t1.elts[index1.get(i)].equals(t2.elts[index2.get(i)])) {
@@ -103,7 +110,6 @@ public class Relation {
                 }
 
                 if (toJoin) {
-                    System.out.println("joining  " + t1 + " & " + t2);
                     for (i = 0; i < t1.elts.length; i++) {
                         newElements.add(t1.elts[i]);
                     }
@@ -151,7 +157,7 @@ public class Relation {
 
 
     /**
-     * substraction
+     * Substraction
      * @param otherRelation to subtract to 'this'
      * Precondition : this and otherRelation have similar attributes
      */
@@ -159,18 +165,8 @@ public class Relation {
         if (otherRelation.attributes.attributes.size() != this.attributes.attributes.size()) {
             return null;
         }
-        int i;
-        boolean toAdd;
         List<Tuple> newTuples = new ArrayList<>();
         for (Tuple t1 : this.tuples) {
-            /*toAdd = false;
-            for (Tuple t2 : otherRelation.tuples) {
-                for  (i = 0; i < this.attributes.attributes.size(); i++) {
-                    if (!t1.elts[i].equals(t2.elts[i])) {
-                        toAdd = true;
-                    }
-                }
-            }*/
             if(!otherRelation.tuples.contains(t1)) {
                 newTuples.add(t1);
             }
@@ -186,5 +182,33 @@ public class Relation {
             str += t.toString() + " ; ";
         }
         return str;
+    }
+
+    public String toStringAsResult() {
+        if (this.tuples.size() == 0) {
+            return "No match";
+        }
+        String res = "";
+        if (this.tuples.size() > 1) {
+            res = this.tuples.size() + " matches : \n";
+        }
+        else {
+            res = "Single match : \n";
+        }
+        String str = "(";
+        for (Variable v : this.attributes.attributes) {
+            str += v.toString() + ",";
+        }
+        str = str.substring(0, str.length() - 1);
+        str += ") = (";
+        for (Tuple t : this.tuples) {
+            res += "     " + str;
+            for (String s : t.elts) {
+                res += s + ",";
+            }
+            res = res.substring(0, res.length() - 1);
+            res += ")\n";
+        }
+        return res;
     }
 }

@@ -1,9 +1,8 @@
 package fr.univlyon1.mif37.dex.mapping.topDown;
-import fr.univlyon1.mif37.dex.mapping.Value;
+
 import fr.univlyon1.mif37.dex.mapping.Variable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 /**
  * @juba BDD

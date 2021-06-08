@@ -70,6 +70,14 @@ public class QsqTemplate {
         this.schemata.add(new TermSchema(headVars));
     }
 
+    /**
+     * Get.
+     * @return List<TermSchema> terms with fixed arity
+     */
+    public List<TermSchema> getSchemata() {
+        return schemata;
+    }
+
     @Override
     public String toString() {
         String str = "";
@@ -81,9 +89,5 @@ public class QsqTemplate {
             ++i;
         }
         return str;
-    }
-
-    public List<TermSchema> getSchemata() {
-        return schemata;
     }
 }
