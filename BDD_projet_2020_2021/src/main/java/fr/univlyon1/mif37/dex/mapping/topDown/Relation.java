@@ -229,6 +229,33 @@ public class Relation {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Relation) {
+            Relation r = (Relation) obj;
+            if (r.tuples.size() != this.tuples.size()) {
+                return false;
+            }
+            if (this.attributes.attributes.size() != r.attributes.attributes.size()) {
+                return false;
+            }
+            for (Variable v1 : this.attributes.attributes) {
+                if (!r.attributes.attributes.contains(v1)) {
+                    return false;
+                }
+            }
+            for (Tuple t1 : this.tuples) {
+                if (!r.tuples.contains(t1)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
         String str = this.attributes.attributes.toString() + " -> ";
         for(Tuple t : tuples) {

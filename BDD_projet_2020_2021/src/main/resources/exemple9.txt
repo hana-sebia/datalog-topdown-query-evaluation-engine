@@ -38,7 +38,7 @@ enfant(violette,zoe)
 enfant(violette,jules)
 enfant(charlotte,zoe)
 enfant(charlotte,jules)
-cst(cedric)
+cst(daniela)
 
 IDB
 parent($x,$y)
