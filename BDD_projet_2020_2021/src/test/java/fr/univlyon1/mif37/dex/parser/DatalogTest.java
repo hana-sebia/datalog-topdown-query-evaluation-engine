@@ -18,6 +18,7 @@ import java.util.*;
 public class DatalogTest {
 
     static final int NB_EXAMPLES = 10;
+    static final String filepath = "/qsqrEngine/exemple";
 
     public DatalogTest() throws ParseException {
     }
@@ -221,7 +222,7 @@ public class DatalogTest {
         results.add(new Relation(tempVariables, tempTuples));
 
         for (int i = 0; i < NB_EXAMPLES; i++) {
-            mp = new MappingParser(App.class.getResourceAsStream("/exemple" + (i + 1) + ".txt"));
+            mp = new MappingParser(App.class.getResourceAsStream(filepath + (i + 1) + ".txt"));
             mapping = mp.mapping();
             rs = new RecursiveQsqEngine(mapping);
             if (!rs.result.equals(results.get(i))) {
