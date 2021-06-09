@@ -1,3 +1,6 @@
 BDD_projet_2020_2021/*iml
 BDD_projet_2020_2021/.idea/
 .idea
+BDD_projet_2020_2021/generated-sources
+BDD_projet_2020_2021/target/classes/
+BDD_projet_2020_2021/target/maven-status/
