@@ -1,0 +1,30 @@
+
+%%%%% EDB %%%%%%%
+
+:-type(sequelOf(x:string, y:string)).
+
+sequelOf(t1,t2).
+sequelOf(t2,t3).
+sequelOf(t3,t4).
+sequelOf(t5,t6).
+sequelOf(t6,t7).
+sequelOf(t7,t8).
+
+
+
+%%%%%% MAPPING %%%%%%%%%%%%%
+
+firstSequelOf(X,Y):- sequelOf(X,Y).
+followOn(X,Y):- firstSequelOf(X,Y).
+followOn(X,Y):- firstSequelOf(X,Z),followOn(Z,Y).
+query(X,Y) :- followOn(X,Y).
+
+
+
+
+
+
+
+
+
+

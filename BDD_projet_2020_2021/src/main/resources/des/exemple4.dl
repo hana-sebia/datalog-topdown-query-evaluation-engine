@@ -1,0 +1,17 @@
+%%%%% EDB %%%%%%%
+
+:-type(link(x:string, y:string)).
+
+link(charpennes,perrache).
+link(partDieu,charpennes).
+link(debourg,partDieu).
+link(partDieu,debourg).
+
+
+%%%% MAPPING %%%%%%
+
+metro(X) :- link(X,_).
+metro(Y) :- link(_,Y).
+reachable(X,Y) :- link(X,Y).
+reachable(X,Y) :- link(X,Z),reachable(Z,Y).
+query(Y) :- reachable(perrache,Y).

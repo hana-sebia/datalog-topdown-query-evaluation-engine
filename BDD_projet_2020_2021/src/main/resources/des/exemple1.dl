@@ -1,0 +1,23 @@
+%%%%% EDB %%%%%%%
+
+:-type(q(x:string)).
+
+q(a).
+q(b).
+
+:-type(t(x:string)).
+
+t(b).
+t(a).
+
+:-type(s(x:string)).
+s(b).
+
+
+
+%%%% MAPPING %%%%%%
+
+p(X) :- q(X).
+r(X) :- t(X).
+r(X) :- p(X),r(X).
+query(X) :- r(X).
