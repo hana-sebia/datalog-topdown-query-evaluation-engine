@@ -3,7 +3,7 @@ link(Charpennes,Perrache)
 link(PartDieu,Charpennes)
 link(Debourg,PartDieu)
 link(PartDieu,Debourg)
-cst(Debourg)
+cst(Charpennes)
 
 IDB
 metro($x)

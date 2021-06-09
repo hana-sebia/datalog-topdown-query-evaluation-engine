@@ -122,18 +122,19 @@ public class Relation {
     }
 
     public Relation projection(final List<Variable> varsRelation) {
+        if(this.attributes.attributes.isEmpty()) {
+            return this;
+        }
         List<Integer> index = new ArrayList<>();
-        int i;
         for(Variable var: varsRelation) {
-            i = 0;
             for(Variable v: this.attributes.attributes){
                 if(var.equals(v)){
-                    index.add(i);
+                    index.add(this.attributes.attributes.indexOf(v));
                     break;
                 }
-                i++;
             }
         }
+
         ArrayList<Tuple> newTuples = new ArrayList<>();
         for(Tuple tuple: this.tuples) {
             List<String> values = new ArrayList<>();
@@ -184,10 +185,10 @@ public class Relation {
         }
         if (this.tuples.size() == 0) {
             if (otherRelation.tuples.size() == 0) {
-                return null;
+                return new Relation();
             }
             else {
-                return otherRelation;
+                return new Relation(otherRelation.attributes.attributes, otherRelation.tuples);
             }
         }
         else if (otherRelation.tuples.size() == 0) {
@@ -220,6 +221,15 @@ public class Relation {
             }
         }
         return new Relation(newVariables, newTuples);
+    }
+
+    public Relation linkRelations(Relation otherRelation) {
+        for (Variable v1 : this.attributes.attributes) {
+            if (otherRelation.attributes.attributes.contains(v1)) {
+                return this.join(otherRelation);
+            }
+        }
+        return this.cartesianProduct(otherRelation);
     }
 
     @Override

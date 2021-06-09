@@ -1,0 +1,20 @@
+EDB
+sequelOf(t1,t2)
+sequelOf(t2,t3)
+sequelOf(t3,t4)
+sequelOf(t5,t6)
+sequelOf(t6,t7)
+sequelOf(t7,t8)
+
+
+
+IDB
+firstSequelOf($x,$y)
+followOn($x,$y)
+query($x,$y)
+
+MAPPING
+sequelOf($x,$y) -> firstSequelOf($x,$y).
+firstSequelOf($x,$y) -> followOn($x,$y).
+firstSequelOf($x,$z),followOn($z,$y) -> followOn($x,$y).
+followOn($x,$y) -> query($x,$y).
