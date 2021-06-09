@@ -75,42 +75,23 @@ public class RecursiveQsqEngine {
 
         // Step 1 :
         // Identify the adorned rules with relevant P predicate in the body of the query
+        AdornedTgd ruleQuery = null;
         AdornedAtom query = null;
-        List<AdornedAtom> body = new ArrayList<>();
         for(Map.Entry<AdornedAtom, List<AdornedTgd>> rule : state.adornedRules.entrySet()) {
             if(rule.getKey().getAtom().getName().equals("query")) {
+                ruleQuery = rule.getValue().get(0);
                 query = rule.getKey();
-                body = rule.getValue().get(0).getBody();
             }
         }
-
-        List<Variable> cstAttributes = (List<Variable>) body.get(0).getAtom().getVars();
-        List<Tuple>  cstTuples = new ArrayList<>();
-        for(fr.univlyon1.mif37.dex.mapping.Relation r : mapping.getEDB()) {
-            if(r.getName().equals("cst")){
-                cstTuples.add(new Tuple(Arrays.asList(r.getAttributes())));
-            }
-        }
-        // Calculate Input_Predicate
-        AdornedAtom predicate = body.get(1);
-        state.inputByRule.replace(predicate, new Relation(cstAttributes, cstTuples));
-        state.inputCount += cstTuples.size();
-
         int inputCountCopy;
         int ansCountCopy;
-        int index = 1;
         do {
             inputCountCopy = state.inputCount;
             ansCountCopy = state.ansCount;
-            for(AdornedTgd rule : state.adornedRules.get(predicate)){
-                qsqrSubroutine(rule, state.inputByRule.get(predicate), state, mapping);
-            }
-
-            index++;
+            qsqrSubroutine(ruleQuery, state.inputByRule.get(query), state, mapping);
         } while (ansCountCopy != state.ansCount || inputCountCopy != state.inputCount);
         // Projection of Output_predicate on query's variables
-        result = state.ans.get(predicate).projection((List<Variable>) query.getAtom().getVars());
-        // return the result
+        result = state.ans.get(query);
     }
 
 
@@ -139,8 +120,8 @@ public class RecursiveQsqEngine {
             // Case EDB
             if(map.getEdbNames().contains(atom.getAtom().getName())) {
                 Relation edb = new Relation(atom.getAtom().getName(), (List<Variable>) atom.getAtom().getVars(), map);
-                //reste la jointure entre sup_i-1 et edb puis projection sur les variables de sup_i
-                Relation result= edb.join(sup.get(i-1)).projection(sup.get(i).attributes.attributes);
+                //reste la linkRelationsture entre sup_i-1 et edb puis projection sur les variables de sup_i
+                Relation result = edb.linkRelations(sup.get(i-1)).projection(sup.get(i).attributes.attributes);
                 sup.get(i).tuples.addAll(result.tuples);
             }
             // Case IDB
@@ -148,16 +129,16 @@ public class RecursiveQsqEngine {
                 // faut faire une projection de sup_i-1 sur boundVars de IDB - Input_IDB = S
                 Relation s = sup.get(i-1).projection(atom.getBoundVariables()).substract(state.inputByRule.get(atom));
                 // faut faire Input_IDB = Input_IDB U S
-                if(!s.tuples.isEmpty()) {
+                if(!s.tuples.isEmpty() || state.inputByRule.get(atom).tuples.isEmpty()) {
                     state.inputByRule.get(atom).tuples.addAll(s.tuples);
                     state.inputCount += s.tuples.size();
                     for(AdornedTgd r:state.adornedRules.get(atom)){
-                        // lancer l'appel récursif
                         qsqrSubroutine(r, state.inputByRule.get(atom), state, map);
                     }
                 }
                 // sup_i = sup_i join output_IDB
-                Relation sup_i = sup.get(i-1).join(state.ans.get(atom).projection(sup.get(i).attributes.attributes));
+                Relation rename_output = new Relation((List<Variable>) atom.getAtom().getVars(), state.ans.get(atom).tuples);
+                Relation sup_i = sup.get(i-1).linkRelations(rename_output).projection(sup.get(i).attributes.attributes);
                 sup.get(i).tuples.addAll(sup_i.tuples);
             }
             i++;
@@ -171,7 +152,5 @@ public class RecursiveQsqEngine {
             }
         }
         state.ansCount += state.ans.get(rule.getHead()).tuples.size();
-
     }
-
 }

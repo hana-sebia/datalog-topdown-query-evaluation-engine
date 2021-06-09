@@ -1,5 +1,7 @@
 EDB
 q(a)
+q(b)
+t(b)
 s(b)
 t(a)
 
@@ -10,5 +12,7 @@ p($x)
 query($x)
 
 MAPPING
+q($x) -> p($x).
 t($x) -> r($x).
+p($x),r($x) -> r($x).
 r($x) -> query($x).

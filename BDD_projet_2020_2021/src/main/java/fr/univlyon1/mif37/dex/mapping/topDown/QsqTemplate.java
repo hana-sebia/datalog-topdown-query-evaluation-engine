@@ -28,16 +28,18 @@ public class QsqTemplate {
         List<Variable> boundVarsHead = new ArrayList<>();
         // supp0 : add bound variables only
         ArrayList<Variable> headVars = (ArrayList<Variable>) rule.getHead().getAtom().getVars();
+        ArrayList<Variable> seenHeadVars = new ArrayList<>();
+
         for (int i = 0; i < rule.getHead().getAdornment().size(); i++){
             if(rule.getHead().getAdornment().get(i)) {
                 boundVarsHead.add(new Variable(headVars.get(i).getName()));
+                seenHeadVars.add(new Variable(headVars.get(i).getName()));
             }
         }
         this.schemata.add(new TermSchema(boundVarsHead));
 
         // supp1 - supp n-1 : add variables bound before and needed later
         ArrayList<AdornedAtom> body = (ArrayList<AdornedAtom>) rule.getBody();
-        ArrayList<Variable> seenHeadVars = new ArrayList<>();
         ArrayList<Variable> vars = new ArrayList<>();
         for (int i = 0; i < body.size() - 1; i++){
             vars.clear();
@@ -46,7 +48,7 @@ public class QsqTemplate {
             vars.addAll(seenHeadVars);
             for(Variable v : atomVariables){
 
-                if(headVars.contains(v)) {
+                if(rule.getHead().getAtom().getVars().contains(v)) {
                     if(!vars.contains(v))
                         vars.add(new Variable(v.getName()));
                     if(!seenHeadVars.contains(v))

@@ -128,18 +128,19 @@ public class Relation {
     }
 
     public Relation projection(final List<Variable> varsRelation) {
+        if(this.attributes.attributes.isEmpty()) {
+            return this;
+        }
         List<Integer> index = new ArrayList<>();
-        int i;
         for(Variable var: varsRelation) {
-            i = 0;
             for(Variable v: this.attributes.attributes){
                 if(var.equals(v)){
-                    index.add(i);
+                    index.add(this.attributes.attributes.indexOf(v));
                     break;
                 }
-                i++;
             }
         }
+
         ArrayList<Tuple> newTuples = new ArrayList<>();
         for(Tuple tuple: this.tuples) {
             List<String> values = new ArrayList<>();
@@ -174,6 +175,58 @@ public class Relation {
         return new Relation(this.attributes.attributes, newTuples);
     }
 
+    public Relation cartesianProduct(Relation otherRelation) {
+        if (otherRelation == null) {
+            return new Relation(this.attributes.attributes, this.tuples);
+        }
+        if (this.tuples.size() == 0) {
+            if (otherRelation.tuples.size() == 0) {
+                return new Relation();
+            }
+            else {
+                return new Relation(otherRelation.attributes.attributes, otherRelation.tuples);
+            }
+        }
+        else if (otherRelation.tuples.size() == 0) {
+            return new Relation(this.attributes.attributes, this.tuples);
+        }
+
+        List<Variable> newVariables = new ArrayList<>();
+        List<Tuple> newTuples = new ArrayList<>();
+        List<String> e1 = new ArrayList<>();
+        List<String> e2 = new ArrayList<>();
+        int i;
+
+        newVariables.addAll(this.attributes.attributes);
+        newVariables.addAll(otherRelation.attributes.attributes);
+
+        for (Tuple t1 : this.tuples) {
+            e1.clear();
+            for (i = 0; i < t1.elts.length; i++) {
+                e1.add(t1.elts[i]);
+            }
+            for (Tuple t2 : otherRelation.tuples) {
+                e2.clear();
+                for (i = 0; i < t1.elts.length; i++) {
+                    e2.add(t1.elts[i]);
+                }
+                for (i = 0; i < t2.elts.length; i++) {
+                    e2.add(t2.elts[i]);
+                }
+                newTuples.add(new Tuple(e2));
+            }
+        }
+        return new Relation(newVariables, newTuples);
+    }
+
+    public Relation linkRelations(Relation otherRelation) {
+        for (Variable v1 : this.attributes.attributes) {
+            if (otherRelation.attributes.attributes.contains(v1)) {
+                return this.join(otherRelation);
+            }
+        }
+        return this.cartesianProduct(otherRelation);
+    }
 
     @Override
     public String toString() {

@@ -11,7 +11,7 @@ public class App {
     private static final Logger LOG = LoggerFactory.getLogger(App.class);
 
     public static void main(String[] args) throws Exception {
-        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple3.txt"));
+        MappingParser mp = new MappingParser(App.class.getResourceAsStream("/exemple7.txt"));
         Mapping mapping = mp.mapping();
 
         LOG.info("\n"+mapping.toString());
@@ -24,6 +24,5 @@ public class App {
         RecursiveQsqEngine rs = new RecursiveQsqEngine(mapping);
         long end = System.currentTimeMillis();
         System.out.println("\n" + rs.result.toStringAsResult(end - begin) + "\n");
-
     }
 }
