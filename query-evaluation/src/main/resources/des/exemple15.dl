@@ -1,0 +1,70 @@
+%%%%% EDB %%%%%%%
+
+:-type(homme(x:string)).
+
+homme(alphonse).
+homme(bernard).
+homme(cedric).
+homme(david).
+homme(fabien).
+homme(gerard).
+homme(hubert).
+homme(jules).
+homme(kevin).
+homme(lucien).
+
+:-type(femme(x:string)).
+
+femme(charlotte).
+femme(daniela).
+femme(eloise).
+femme(marie).
+femme(nathalie).
+femme(ophelie).
+femme(stephanie).
+femme(violette).
+femme(zoe).
+
+:-type(enfant(x:string, y:string)).
+
+enfant(alphonse,bernard).
+enfant(alphonse,eloise).
+enfant(cedric,fabien).
+enfant(cedric,nathalie).
+enfant(daniela,kevin).
+enfant(daniela,charlotte).
+enfant(fabien,lucien).
+enfant(fabien,marie).
+enfant(gerard,lucien).
+enfant(gerard,marie).
+enfant(nathalie,david).
+enfant(nathalie,zoe).
+enfant(ophelie,hubert).
+enfant(ophelie,marie).
+enfant(stephanie,alphonse).
+enfant(stephanie,violette).
+enfant(violette,zoe).
+enfant(violette,jules).
+enfant(charlotte,zoe).
+enfant(charlotte,jules).
+
+%%%%%% MAPPING %%%%%%%%%%%%%
+
+parent(X,Y) :- enfant(Y,X).
+
+pere(X,Y) :- parent(X,Y),homme(X).
+mere(X,Y) :- parent(X,Y),femme(X).
+
+fils(X,Y) :- enfant(X,Y),homme(X).
+fille(X,Y) :- enfant(X,Y),femme(X).
+
+grandParent(X,Y) :- parent(X,Z),parent(Z,Y).
+grandPere(X,Y) :- grandParent(X,Y),homme(X).
+grandMere(X,Y) :- grandParent(X,Y),femme(X).
+
+petitEnfant(X,Y) :- grandParent(Y,X).
+petitFils(X,Y) :-  petitEnfant(X,Y),homme(X).
+petiteFille(X,Y) :-  petitEnfant(X,Y),femme(X).
+
+
+query(X) :- grandParent(X,cedric).
