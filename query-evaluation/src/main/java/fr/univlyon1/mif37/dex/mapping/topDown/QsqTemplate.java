@@ -55,6 +55,7 @@ public class QsqTemplate {
                         seenHeadVars.add(v);
 
                 } else {
+                    // Check the later use of variable
                     for(int j = i+1; j < body.size(); j++){
                         for(Variable vnext: body.get(j).getAtom().getVars()) {
                             if(vnext.equals(v)) {

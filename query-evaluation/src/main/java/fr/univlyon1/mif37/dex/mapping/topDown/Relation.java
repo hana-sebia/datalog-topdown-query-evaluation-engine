@@ -33,22 +33,41 @@ public class Relation {
         this.tuples = new ArrayList<>();
     }
 
+    /**
+     * Construct an empty Relation giving attributes
+     * @param variables a list of attributes
+     */
     public Relation(List<Variable> variables) {
         this.attributes = new TermSchema(variables);
         this.tuples = new ArrayList<>();
     }
 
+    /**
+     * Construct an empty relation relation giving a TermSchema
+     * @param termSchema a list of attibutes
+     */
     public Relation(TermSchema termSchema) {
         this.attributes = termSchema;
         this.tuples = new ArrayList<>();
     }
 
+    /**
+     * Construct a Relation giving attributes and a list of tuples
+     * @param variables attributes
+     * @param tuples tuples
+     */
     public Relation(List<Variable> variables, List<Tuple> tuples) {
         this.attributes = new TermSchema(variables);
         this.tuples = tuples;
 
     }
 
+    /**
+     * Construct a relation from an EDB and fill it
+     * @param name The name of the EDB
+     * @param attributes list of attributes
+     * @param map datalog program mapping
+     */
     public Relation (final String name, List<Variable> attributes, Mapping map) {
         this.attributes = new TermSchema(attributes);
         this.tuples = new ArrayList<>();
@@ -127,6 +146,11 @@ public class Relation {
         return join;
     }
 
+    /**
+     * Project.
+     * @param varsRelation variables on which we project.
+     * @return Relation (PI this)
+     */
     public Relation projection(final List<Variable> varsRelation) {
         if(this.attributes.attributes.isEmpty()) {
             return this;
@@ -175,6 +199,11 @@ public class Relation {
         return new Relation(this.attributes.attributes, newTuples);
     }
 
+    /**
+     * Cartesian product.
+     * @param otherRelation relation to compute with this.
+     * @return Relation (this CARTESIAN_PRODUCT otherRelation)
+     */
     public Relation cartesianProduct(Relation otherRelation) {
         if (otherRelation == null) {
             return new Relation(this.attributes.attributes, this.tuples);
@@ -266,7 +295,7 @@ public class Relation {
 
     public String toStringAsResult(final long elapsedTime) {
         if (this.tuples.size() == 0) {
-            return "No match found";
+            return "No match found (took " + elapsedTime + "ms)";
         }
         String res = "";
         if (this.tuples.size() > 1) {

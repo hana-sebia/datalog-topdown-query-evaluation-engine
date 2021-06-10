@@ -17,6 +17,10 @@ public class AdornedRules {
     Collection<AdornedTgd> adornedRules;
     Collection<AdornedAtom> adornedPredicates;
 
+    /**
+     * Construct the adorned program giving a mapping
+     * @param map the mapping of a datalog program
+     */
     public AdornedRules(final Mapping map) {
         adornedRules = new ArrayList<>();
         adornedPredicates = new ArrayList<>();
@@ -27,7 +31,8 @@ public class AdornedRules {
         List<Boolean> booleans = new ArrayList<>();
         List<String> knownVars = new ArrayList<>();
         List<AdornedAtom> body = new ArrayList<>();
-        for(Tgd t: map.getTgds()){
+
+        for (Tgd t: map.getTgds()){
             if (t.getRight().getName().equals("query")) {
                 for (Value v : t.getRight().getArgs()) {
                     if (v instanceof Variable) {
@@ -36,12 +41,13 @@ public class AdornedRules {
                 }
                 AdornedAtom adornedHead = new AdornedAtom(t.getRight(), booleans);
                 adornedPredicates.add(adornedHead);
-                // Pour chaque literal de la query je calcule l'ornement
+                // For every literal of the body, compute the adornement
                 Literal l;
-                for(int i = 0; i < t.getLeft().size(); i++){
+                for (int i = 0; i < t.getLeft().size(); i++){
                     l = t.getLeft().get(i);
-                    // Si c'est un EDB, je stocke le nom de variables que je connais
-                    if(map.getEdbNames().contains(l.getAtom().getName())){
+                    // Case : EDB
+                    // Store known variables
+                    if (map.getEdbNames().contains(l.getAtom().getName())){
                         booleans.clear();
                         for (Value v : l.getAtom().getArgs()) {
                             if (v instanceof Variable) {
@@ -52,34 +58,39 @@ public class AdornedRules {
                         }
                         body.add(new AdornedAtom(l.getAtom(), booleans));
                     }
-                    // Je vérifie qu'il s'agit bien d'un IDB
+                    // Case : IDB
                     else if(map.getIdbNames().contains(l.getAtom().getName())) {
-                        // Pour chaque value d'un IDB
+                        // For every variable of the IDB
                         booleans.clear();
                         for (Value v : l.getAtom().getArgs()) {
                             if (v instanceof Variable) {
+                                // Check if it's already known
                                 if (knownVars.contains(((Variable) v).getName())) {
                                     booleans.add(true);
                                 } else {
                                     booleans.add(false);
                                     knownVars.add(((Variable) v).getName());
                                 }
-                            } else if( v instanceof Constant) {
+                            }
+                            // Check if it's a constant
+                            else if (v instanceof Constant) {
                                 booleans.add(true);
                             }
                         }
-                        // j'ajoute l'Atom dans le body
+                        // Create an adornedAtom and add it to the body
                         AdornedAtom atom = new AdornedAtom(l.getAtom(), booleans);
-                        adornedPredicates.add(atom);
                         body.add(atom);
+                        // Add the predicate to the list of adorned predicates for which adorned rules have been computed
+                        adornedPredicates.add(atom);
 
-                        for(Tgd rule : map.getTgds()){
-                            if(rule.getRight().getName().equals(l.getAtom().getName())) {
+                        for (Tgd rule : map.getTgds()) {
+                            if (rule.getRight().getName().equals(l.getAtom().getName())) {
                                 recursiveAdornedRules(map, rule, booleans);
                             }
                         }
                     }
                 }
+                // Store the new adorned Tgd
                 adornedRules.add(new AdornedTgd(adornedHead, body));
                 break;
             }
@@ -93,19 +104,21 @@ public class AdornedRules {
         AdornedAtom adHead= new AdornedAtom(rule.getRight(), adornement);
 
         int i;
-        for(i = 0; i < rule.getRight().getArgs().length; i++) {
-            if(rule.getRight().getArgs()[i] instanceof Variable) {
+        for (i = 0; i < rule.getRight().getArgs().length; i++) {
+            if (rule.getRight().getArgs()[i] instanceof Variable) {
                 if (adornement.get(i)) {
                     knownVariables.add(((Variable) rule.getRight().getArgs()[i]).getName());
                 }
             }
         }
 
+        // For every literal of the body, compute the adornement
         Literal l;
-        for(i = 0; i < rule.getLeft().size(); i++){
+        for (i = 0; i < rule.getLeft().size(); i++){
             l = rule.getLeft().get(i);
-            // Si c'est un EDB, je stocke le nom de variables que je connais
-            if(map.getEdbNames().contains(l.getAtom().getName())){
+            // Case : EDB
+            // Store known variables
+            if (map.getEdbNames().contains(l.getAtom().getName())){
                 booleans.clear();
                 for (Value v : l.getAtom().getArgs()) {
                     if (v instanceof Variable) {
@@ -117,11 +130,12 @@ public class AdornedRules {
                 body.add(new AdornedAtom(l.getAtom(), booleans));
 
             }
-            // Je vérifie qu'il s'agit bien d'un IDB
+            // Case : IDB
             else if(map.getIdbNames().contains(l.getAtom().getName())) {
-                // Pour chaque value d'un IDB
+                // For every variable of the IDB
                 booleans.clear();
                 for (Value v : l.getAtom().getArgs()) {
+                    // Check if it's already known
                     if (v instanceof Variable) {
                         if (knownVariables.contains(((Variable) v).getName())) {
                             booleans.add(true);
@@ -129,11 +143,12 @@ public class AdornedRules {
                             booleans.add(false);
                             knownVariables.add(((Variable) v).getName());
                         }
-                    } else if( v instanceof Constant) {
+                    }
+                    // Check if it's a constant
+                    else if( v instanceof Constant) {
                         booleans.add(true);
                     }
                 }
-                // j'ajoute l'Atom dans le body
                 AdornedAtom atom = new AdornedAtom(l.getAtom(), booleans);
                 body.add(atom);
                 if(!adornedPredicates.contains(atom)){
@@ -149,20 +164,11 @@ public class AdornedRules {
         adornedRules.add(new AdornedTgd(adHead, body));
     }
 
-
-    @Override
-    public String toString() {
-        String str = "";
-        for (AdornedTgd adornedTgd : adornedRules) {
-            str += adornedTgd.toString() + "\n";
-        }
-        return str;
-    }
-
-    public ArrayList<AdornedTgd> getAdornedRules() {
-        return (ArrayList<AdornedTgd>) adornedRules;
-    }
-
+    
+    /**
+     * Create a map of adorned rules for every adorned Predicate.
+     * @return a map of adorned rules for every adorned Predicate.
+     */
     public Map<AdornedAtom, List<AdornedTgd>> adornedMap() {
         Map<AdornedAtom, List<AdornedTgd>> map = new HashMap<>();
         for(AdornedAtom p: adornedPredicates) {
@@ -176,5 +182,15 @@ public class AdornedRules {
         }
 
         return map;
+    }
+
+
+    @Override
+    public String toString() {
+        String str = "";
+        for (AdornedTgd adornedTgd : adornedRules) {
+            str += adornedTgd.toString() + "\n";
+        }
+        return str;
     }
 }

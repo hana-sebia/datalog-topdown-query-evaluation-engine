@@ -9,9 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 /**
- * @juba BDD
- */
-/**
  * A Datalog evaluation engine that uses a recursive version of the
  * query-subquery top-down technique.
  *
@@ -29,7 +26,7 @@ public class RecursiveQsqEngine {
          */
         private Map<AdornedAtom,Relation> ans;
         /**
-         * Tracks which input tuples have been used for each rule.
+         * Tracks the input tuples used for each rule.
          */
         private Map<AdornedAtom,Relation> inputByRule;
         /**
@@ -37,19 +34,21 @@ public class RecursiveQsqEngine {
          */
         private Map<AdornedAtom, List<AdornedTgd>> adornedRules;
         /**
-         * Holds all the unadorned rules for a given predicate.
+         * Holds the total number of tuples in the output_relations
          */
         private int ansCount;
-
+        /**
+         * Holds the total number of tuples in the input_relations
+         */
         private int inputCount;
 
 
 
         /**
-         * Initializes state with a set of all unadorned rules for the program.
+         * Initializes state with a set of all adorned rules for the program.
          *
          * @param adornedRules
-         *            set of unadorned rules
+         *            set of adorned rules
          */
         public QSQRState(Map<AdornedAtom,List<AdornedTgd>> adornedRules) {
             this.adornedRules = adornedRules;
@@ -58,6 +57,7 @@ public class RecursiveQsqEngine {
             this.ansCount = 0;
             this.inputCount = 0;
 
+            // Generate an empty input and output relation for each adorned atom
             for(Map.Entry<AdornedAtom, List<AdornedTgd>> map: adornedRules.entrySet()) {
                 ans.put(map.getKey(), new Relation((List<Variable>) map.getKey().getAtom().getVars()));
                 inputByRule.put(map.getKey(), new Relation(map.getKey().getBoundVariables()));
@@ -68,13 +68,14 @@ public class RecursiveQsqEngine {
     /**
      * Constructor.
      * @param mapping
+     *          contains the datalog mapping (EDB, IDB, TGD)
      */
     public RecursiveQsqEngine(Mapping mapping) {
         AdornedRules adornedRules = new AdornedRules(mapping);
         QSQRState state = new QSQRState(adornedRules.adornedMap());
 
-        // Step 1 :
-        // Identify the adorned rules with relevant P predicate in the body of the query
+
+        // Identify the adorned rule with the head "query"
         AdornedTgd ruleQuery = null;
         AdornedAtom query = null;
         for(Map.Entry<AdornedAtom, List<AdornedTgd>> rule : state.adornedRules.entrySet()) {
@@ -83,14 +84,20 @@ public class RecursiveQsqEngine {
                 query = rule.getKey();
             }
         }
+
+        // Do the recursive call until there is no new tuples added to the input or output relation
         int inputCountCopy;
         int ansCountCopy;
         do {
             inputCountCopy = state.inputCount;
             ansCountCopy = state.ansCount;
+
+            // Evaluate the query giving an input relation and the current state of the QSQR engine
             qsqrSubroutine(ruleQuery, state.inputByRule.get(query), state, mapping);
+
         } while (ansCountCopy != state.ansCount || inputCountCopy != state.inputCount);
-        // Projection of Output_predicate on query's variables
+
+        // Report the query's output_relation in the result variable
         result = state.ans.get(query);
     }
 
@@ -106,51 +113,65 @@ public class RecursiveQsqEngine {
      *            current state of evaluation-wide variables
      */
     private void qsqrSubroutine(AdornedTgd rule, Relation newInput, QSQRState state, Mapping map) {
+        // STEP 1 :
+        // Initialize auxiliary relations to empty sets
         QsqTemplate qsqTemplate = new QsqTemplate(rule);
         List<Relation> sup = new ArrayList<>();
         for(TermSchema t: qsqTemplate.getSchemata()) {
             sup.add(new Relation(t));
         }
 
-        //sup0
+        // STEP 2 :
+        // Compute sup0
         sup.get(0).tuples.addAll(newInput.tuples);
         int i = 1;
-        //sup1 - supn
+
+        // STEP 3 :
+        // Compute sup1 - supn
         for(AdornedAtom atom: rule.getBody()){
             // Case EDB
             if(map.getEdbNames().contains(atom.getAtom().getName())) {
+                // Compute all the matches for the atom in the mapped program
                 Relation edb = new Relation(atom.getAtom().getName(), (List<Variable>) atom.getAtom().getVars(), map);
-                //reste la linkRelationsture entre sup_i-1 et edb puis projection sur les variables de sup_i
+                // Compute edb join sup i-1, projected on sup i
                 Relation result = edb.linkRelations(sup.get(i-1)).projection(sup.get(i).attributes.attributes);
+                // add the result to sup i
                 sup.get(i).tuples.addAll(result.tuples);
             }
             // Case IDB
             else {
-                // faut faire une projection de sup_i-1 sur boundVars de IDB - Input_IDB = S
+                // Compute sup i-1 projected on BoundVars(Atom) - Input(Atom)
                 Relation s = sup.get(i-1).projection(atom.getBoundVariables()).substract(state.inputByRule.get(atom));
-                // faut faire Input_IDB = Input_IDB U S
+
+                // If the Input(Atom) changes, call recursively this method on all rules with head predicate Atom
                 if(!s.tuples.isEmpty() || state.inputByRule.get(atom).tuples.isEmpty()) {
+                    // Add the new tuples to the Input(Atom)
                     state.inputByRule.get(atom).tuples.addAll(s.tuples);
+                    // Increment the input's counter
                     state.inputCount += s.tuples.size();
+
                     for(AdornedTgd r:state.adornedRules.get(atom)){
                         qsqrSubroutine(r, state.inputByRule.get(atom), state, map);
                     }
                 }
-                // sup_i = sup_i join output_IDB
+
                 Relation rename_output = new Relation((List<Variable>) atom.getAtom().getVars(), state.ans.get(atom).tuples);
+                // Compute sup i as sup i-1 join output(Atom), projected on sup i
                 Relation sup_i = sup.get(i-1).linkRelations(rename_output).projection(sup.get(i).attributes.attributes);
                 sup.get(i).tuples.addAll(sup_i.tuples);
             }
             i++;
         }
 
-        //supn
+        // STEP 4 :
+        // Add the result of sup n to the output relation of the adorned predicate
         state.ansCount -= state.ans.get(rule.getHead()).tuples.size();
         for(Tuple t : sup.get(sup.size()-1).tuples) {
             if(!state.ans.get(rule.getHead()).tuples.contains(t)) {
                 state.ans.get(rule.getHead()).tuples.add(t);
             }
         }
+        // Increment the answer's counter
         state.ansCount += state.ans.get(rule.getHead()).tuples.size();
     }
 }
