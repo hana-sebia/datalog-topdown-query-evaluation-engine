@@ -67,4 +67,4 @@ petitFils(X,Y) :-  petitEnfant(X,Y),homme(X).
 petiteFille(X,Y) :-  petitEnfant(X,Y),femme(X).
 
 
-query(X) :- grandPere(X,nathalie).
+query(X) :- grandParent(X,cedric).

@@ -38,7 +38,7 @@ enfant(violette,zoe)
 enfant(violette,jules)
 enfant(charlotte,zoe)
 enfant(charlotte,jules)
-cst(nathalie)
+cst(cedric)
 
 IDB
 parent($x,$y)
@@ -66,4 +66,4 @@ grandParent($x,$y),femme($x) -> grandMere($x,$y).
 grandParent($y,$x) -> petitEnfant($x,$y).
 petitEnfant($x,$y),homme($x) -> petitFils($x,$y).
 petitEnfant($x,$y),femme($x) -> petiteFille($x,$y).
-cst($y), grandPere($x,$y) -> query($x).
+cst($y), grandParent($x,$y) -> query($x).

@@ -221,6 +221,79 @@ public class DatalogTest {
         tempTuples.add(new Tuple(elmts));
         results.add(new Relation(tempVariables, tempTuples));
 
+        /************ exemple11.txt *************/
+        tempVariables = new ArrayList<>();
+        tempTuples = new ArrayList<>();
+        elmts = new ArrayList<>();
+        tempVariables.add(new Variable("$x"));
+        elmts.add("fabien");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("nathalie");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("lucien");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("marie");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("david");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("zoe");
+        tempTuples.add(new Tuple(elmts));
+        results.add(new Relation(tempVariables, tempTuples));
+
+        /************ exemple12.txt *************/
+        tempVariables = new ArrayList<>();
+        tempTuples = new ArrayList<>();
+        elmts = new ArrayList<>();
+        tempVariables.add(new Variable("$x"));
+        elmts.add("alpohonose");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("violette");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("bernard");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("eloise");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("jules");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("zoe");
+        tempTuples.add(new Tuple(elmts));
+        results.add(new Relation(tempVariables, tempTuples));
+
+        /************ exemple13.txt *************/
+        tempVariables = new ArrayList<>();
+        tempTuples = new ArrayList<>();
+        elmts = new ArrayList<>();
+        tempVariables.add(new Variable("$x"));
+        results.add(new Relation(tempVariables, tempTuples));
+
+        /************ exemple14.txt *************/
+        tempVariables = new ArrayList<>();
+        tempTuples = new ArrayList<>();
+        elmts = new ArrayList<>();
+        tempVariables.add(new Variable("$x"));
+        elmts.add("lucien");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("marie");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("david");
+        tempTuples.add(new Tuple(elmts));
+        elmts.clear();
+        elmts.add("zoe");
+        tempTuples.add(new Tuple(elmts));
+        results.add(new Relation(tempVariables, tempTuples));
+
         for (int i = 0; i < NB_EXAMPLES; i++) {
             mp = new MappingParser(App.class.getResourceAsStream(filepath + (i + 1) + ".txt"));
             mapping = mp.mapping();

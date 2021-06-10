@@ -51,6 +51,20 @@ enfant(charlotte,jules).
 %%%%%% MAPPING %%%%%%%%%%%%%
 
 parent(X,Y) :- enfant(Y,X).
-ancetre(X,Y) :- parent(X,Y).
-ancetre(X,Y) :- parent(X,Z),ancetre(Z,Y).
-query(X) :- ancetre(X,stephanie).
+
+pere(X,Y) :- parent(X,Y),homme(X).
+mere(X,Y) :- parent(X,Y),femme(X).
+
+fils(X,Y) :- enfant(X,Y),homme(X).
+fille(X,Y) :- enfant(X,Y),femme(X).
+
+grandParent(X,Y) :- parent(X,Z),parent(Z,Y).
+grandPere(X,Y) :- grandParent(X,Y),homme(X).
+grandMere(X,Y) :- grandParent(X,Y),femme(X).
+
+petitEnfant(X,Y) :- grandParent(Y,X).
+petitFils(X,Y) :-  petitEnfant(X,Y),homme(X).
+petiteFille(X,Y) :-  petitEnfant(X,Y),femme(X).
+
+
+query(X) :- grandPere(X,nathalie).
